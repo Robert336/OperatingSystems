@@ -33,11 +33,16 @@ int main(){
     int shmFileDesc;
     
     // Pointer to the shared memory object
-    void *ptr;
+    void *shm_ptr;
 
     // Opening the shared memory 
     if (shm_open(name, O_RDONLY, 0666) < 0) { printf("shared memory failed to open");}
 
+    // Memory mapping the shared memory object
+    shm_ptr = mmap(0, SIZE, PROT_READ, MAP_SHARED, shmFileDesc, 0);
+
+
+    // Child process to read from file
     pid_t child_pid = fork(); // creating child process
 
     if(child_pid == 0){
@@ -46,7 +51,7 @@ int main(){
         FILE *fp;
         fp = fopen("sample_in.txt", "r"); // opens file in "read" mode
 
-
+        // read file to shared memory. line by line.        
 
     }
 
@@ -54,19 +59,8 @@ int main(){
 }
 
 
-
-// Read file function
-void readFile(){
-    FILE *fp;
-    fp = fopen("sample_in.txt", "r");
-
-
-}
-
-
-
 // Output function
-void writeOuput(char* command, char* output)
+void writeOutput(char* command, char* output)
 {
     FILE* fp;
     // open file in writing mode
