@@ -52,7 +52,7 @@ int main(){
 
     // Memory mapping the shared memory object
     shm_ptr = mmap(0, SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
-    if (ptr == MAP_FAILED) {
+    if (shm_ptr == MAP_FAILED) {
 		printf("Map failed\n");
 		exit(-1);
 	}
