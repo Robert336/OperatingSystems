@@ -12,6 +12,10 @@
 #include <fcntl.h>
 #include <sys/shm.h>
 
+void readFile(void *shm_ptr);
+void writeOutput(char* command, char* output);
+
+
 int main(){
     printf("Start of the parent process");
 
