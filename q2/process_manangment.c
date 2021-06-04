@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <unistd.h>
-//#include <sys/mman.h>
+#include <sys/mman.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include<sys/shm.h>
@@ -36,23 +36,30 @@ int main(){
     void *shm_ptr;
 
     // Opening the shared memory 
-    if (shm_open(name, O_RDONLY, 0666) < 0) { printf("shared memory failed to open");}
+    if (shm_open(name, O_RDWR, 0666) < 0) { printf("shared memory failed to open");}
 
     // Memory mapping the shared memory object
     shm_ptr = mmap(0, SIZE, PROT_READ, MAP_SHARED, shmFileDesc, 0);
 
 
     // Child process to read from file
-    pid_t child_pid = fork(); // creating child process
+    int child_pid = fork(); // creating child process
 
     if(child_pid == 0){
         printf("this is a child process");
         
+        char max_char[500]
+
         FILE *fp;
-        fp = fopen("sample_in.txt", "r"); // opens file in "read" mode
+        fp = fopen("sample_in.txt", "rd"); // opens file in "read" mode
 
         // read file to shared memory. line by line.        
+        while(fgets(max_char, 500, fp) != NULL){
+            // concat the newly read line to the main String in shared memory
+        }
 
+    } else if (child_pid == -1){
+        printf("Child process failed");
     }
 
 
@@ -74,7 +81,6 @@ void writeOutput(char* command, char* output)
 	fprintf(fp, "The output of: %s : is\n", command);
 	fprintf(fp, ">>>>>>>>>>>>>>>\n%s<<<<<<<<<<<<<<<\n", output);	
 
-	/* Your code here*/
     fclose(fp);
 
 }
