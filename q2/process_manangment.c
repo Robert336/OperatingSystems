@@ -69,7 +69,7 @@ void readFile(void *shm_ptr){
             char str[20];
             sprintf(str, "%s", max_char);
 
-            printf("%s", (char*)shm_ptr));
+            printf("%s", (char*)shm_ptr);
         }
 
 }
