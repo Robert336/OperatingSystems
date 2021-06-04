@@ -47,9 +47,15 @@ int main(){
     // Opening the shared memory 
     if (shm_fd < 0) { printf("shared memory failed to open");}
 
-    // Memory mapping the shared memory object
-    shm_ptr = mmap(0, SIZE, PROT_READ, MAP_SHARED, shm_fd, 0);
+    // Configures the size if the shared memory
+    ftruncate(shm_fd, SIZE);
 
+    // Memory mapping the shared memory object
+    shm_ptr = mmap(0, SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
+    if (ptr == MAP_FAILED) {
+		printf("Map failed\n");
+		exit(-1);
+	}
 
     // Child process to read from file
     int child_pid = fork(); // creating child process
@@ -72,13 +78,20 @@ void readFile(void *shm_ptr){
         FILE *fp;
         fp = fopen("sample_in.txt", "r"); // opens file in "read" mode
 
-        // read file to shared memory. line by line.        
-        while(fgets(max_char, 500, fp) != NULL){
+        // read file to shared memory. line by line.  
+        char str[60];
+        str = fgets(max_char, 500, fp);
+        while(str != NULL){
             // concat the newly read line to the main String in shared memory
-            char str[20];
-            sprintf(str, "%s", max_char);
+            // print to the shared memory (shm_ptr)
+            sprintf(shm_ptr, "%s", (char*)max_char);
+            shm_ptr += strlen(str);
 
+            // test
             printf("%s", (char*)shm_ptr);
+            
+            // reads the next line
+            str = fgets(max_char, 500, fp);
         }
 
 }
