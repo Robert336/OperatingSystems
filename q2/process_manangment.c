@@ -17,7 +17,7 @@ void writeOutput(char* command, char* output);
 
 
 int main(){
-    printf("Start of the parent process");
+    printf("Start of the parent process\n");
 
     /* GENERAL OBJECTIVE
         create child process to get linux coommands from file and store in shared memory
@@ -38,7 +38,7 @@ int main(){
     
     // Pointer to the shared memory object
     void *shm_ptr;
-
+    
 
     shm_fd = shm_open(name, O_CREAT | O_RDWR, 0666);
 
