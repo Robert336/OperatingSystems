@@ -47,8 +47,19 @@ int main(){
 
     if(child_pid == 0){
         printf("this is a child process");
+        readFile();
         
-        char max_char[500]
+
+    } else if (child_pid == -1){
+        printf("Child process failed");
+    }
+
+
+}
+
+// Read file
+void readFile(){
+    char max_char[500]
 
         FILE *fp;
         fp = fopen("sample_in.txt", "rd"); // opens file in "read" mode
@@ -56,13 +67,10 @@ int main(){
         // read file to shared memory. line by line.        
         while(fgets(max_char, 500, fp) != NULL){
             // concat the newly read line to the main String in shared memory
+            char str[20]
+            sprintf(str, "%s", max_char);
         }
-
-    } else if (child_pid == -1){
-        printf("Child process failed");
-    }
-
-
+        
 }
 
 
