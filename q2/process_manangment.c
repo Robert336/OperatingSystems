@@ -47,7 +47,7 @@ int main(){
 
     if(child_pid == 0){
         printf("this is a child process");
-        readFile();
+        readFile(shm_ptr);
         
     } else if (child_pid == -1){
         printf("Child process failed");
@@ -57,7 +57,7 @@ int main(){
 }
 
 // Reads the sample_in.txt file
-void readFile(){
+void readFile(*shm_ptr){
     char max_char[500];
 
         FILE *fp;
@@ -68,7 +68,11 @@ void readFile(){
             // concat the newly read line to the main String in shared memory
             char str[20];
             sprintf(str, "%s", max_char);
+
+            printf("%s", (char*)shm_ptr));
         }
+
+
 
 }
 
