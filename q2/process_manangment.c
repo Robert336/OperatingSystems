@@ -61,7 +61,7 @@ void readFile(void *shm_ptr){
     char max_char[500];
 
         FILE *fp;
-        fp = fopen("sample_in.txt", "rd"); // opens file in "read" mode
+        fp = fopen("sample_in.txt", "r"); // opens file in "read" mode
 
         // read file to shared memory. line by line.        
         while(fgets(max_char, 500, fp) != NULL){
