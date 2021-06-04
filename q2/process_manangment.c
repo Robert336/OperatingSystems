@@ -10,7 +10,7 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include<sys/shm.h>
+#include <sys/shm.h>
 
 int main(){
     printf("Start of the parent process");
@@ -30,16 +30,19 @@ int main(){
     const char *name = "READ_LINE";
 
     // Shared memory file decriptor
-    int shmFileDesc;
+    int shm_fd;
     
     // Pointer to the shared memory object
     void *shm_ptr;
 
+
+    shm_fd = shm_open(name, O_CREAT | O_RDWR, 0666);
+
     // Opening the shared memory 
-    if (shm_open(name, O_CREAT | O_RDWR, 0666) < 0) { printf("shared memory failed to open");}
+    if (shm_fd < 0) { printf("shared memory failed to open");}
 
     // Memory mapping the shared memory object
-    shm_ptr = mmap(0, SIZE, PROT_READ, MAP_SHARED, shmFileDesc, 0);
+    shm_ptr = mmap(0, SIZE, PROT_READ, MAP_SHARED, shm_fd, 0);
 
 
     // Child process to read from file
