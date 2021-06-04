@@ -36,7 +36,7 @@ int main(){
     void *shm_ptr;
 
     // Opening the shared memory 
-    if (shm_open(name, O_RDWR, 0666) < 0) { printf("shared memory failed to open");}
+    if (shm_open(name, O_CREAT | O_RDWR, 0666) < 0) { printf("shared memory failed to open");}
 
     // Memory mapping the shared memory object
     shm_ptr = mmap(0, SIZE, PROT_READ, MAP_SHARED, shmFileDesc, 0);
