@@ -57,7 +57,7 @@ int main(){
 }
 
 // Reads the sample_in.txt file
-void readFile(*shm_ptr){
+void readFile(void *shm_ptr){
     char max_char[500];
 
         FILE *fp;
@@ -71,8 +71,6 @@ void readFile(*shm_ptr){
 
             printf("%s", (char*)shm_ptr));
         }
-
-
 
 }
 
