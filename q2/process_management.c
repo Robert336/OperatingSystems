@@ -29,8 +29,8 @@ int main(int argc, char *argv[]);
 void readFile(char *shm_ptr, char *filename, int length);
 void writeOutput(char *command, char *output);
 void exec_cmds_from_shm(char *memory_pointer);
-void write_cmds_output_to_pipe(char *ptr, int pipeID);
-void pipe_to_file(int pipeID);
+void write_cmds_output_to_pipe(char *ptr, int pipe_ID);
+void pipe_to_file(int pipe_ID);
 
 /* List of various constants used within the program */
 const int SIZE = 4096; // arbitrary size to acomedate Strings being read from the file
@@ -110,17 +110,16 @@ void readFile(char *shm_ptr, char* fileName, int file_length)
     }
 }
 
-/*
-*/
+//Executes the given commands from the shared memory into the pipe
 void exec_cmds_from_shm(char *memory_pointer) {
     char *ptr = memory_pointer;
 
     char *pipe_name = "/tmp/mypipe"; // naming the pipe file
     mkfifo(pipe_name, 0666); // creates named pipe that stays active until pipe is closed
-    pid_t pid = fork(); // create child process
+    pid_t process_ID = fork(); // create child process
 
-    if (pid == 0) { // child process
-        int pipeID = open(pipe_name, O_WRONLY); // opens pipe in write only mode
+    if (process_ID == 0) { // child process
+        int pipe_ID = open(pipe_name, O_WRONLY); // opens pipe in write only mode
         char result[SIZE];
         for (int i = 0; i < 64; i += 1) {
             char data = (char)ptr[i];
@@ -128,25 +127,26 @@ void exec_cmds_from_shm(char *memory_pointer) {
         }
 
         char *result_ptr = strtok(result, "\r\n"); // 
-        write_cmds_output_to_pipe(result_ptr, pipeID);
-        close(pipeID);
+        write_cmds_output_to_pipe(result_ptr, pipe_ID);
+        close(pipe_ID);
     }
 
-    else if (pid > 0) {
-        int pipeID = open(pipe_name, O_RDONLY);
+    else if (process_ID > 0) {//Parent process id
+        int pipe_ID = open(pipe_name, O_RDONLY);
         int status;
         wait(&status);
         if (WEXITSTATUS(status) == -1) {
-            perror("\nexec_commands_from_memory: Error while waiting\n");
+            perror("\n**ERROR**: Error while waiting\n");
             exit(-1);
         }
-
-        pipe_to_file(pipeID);
-        close(pipeID);
+        // Creates a connection from one end of the pipe to the file
+        pipe_to_file(pipe_ID);
+        //Closes the pipe after it's used
+        close(pipe_ID);
     }
 
     else {
-        printf("\nexec_commands_from_memory: Error while forking\n");
+        printf("\n**ERROR**: Error while forking\n");
         exit(-1);
     }
 }
@@ -171,15 +171,18 @@ void writeOutput(char *command, char *output)
     fclose(fp);
 }
 
-/*
-*/
-void write_cmds_output_to_pipe(char *ptr, int pipeID) {
+// Given commands from shared memory outputs each command line by line to the pipe
+void write_cmds_output_to_pipe(char *ptr, int pipe_ID) {
     char result[SIZE];
+    //While the ptr exists
     while (ptr) {
         FILE *virtual_file = popen(ptr, "r"); // opening pipe file in read
+
         char line[1035];
+        //While the file exists
         if (virtual_file) {
             char first_line[50];
+            //Sends formatted output to ptr
             sprintf(first_line, "The output of: %s : is\n>>>>>>>>>>>>>>>\n", ptr);
             strcat(result, first_line);
 
@@ -192,27 +195,30 @@ void write_cmds_output_to_pipe(char *ptr, int pipeID) {
             strcat(result, "<<<<<<<<<<<<<<<"); // marks end of output
 
         } else {
-            printf("\nexecute_commands: Error while executing '%s'!\n", ptr);
+            printf("\n**ERROR**: Error while executing '%s'!\n", ptr);
             exit(-1);
         }
-
+        
         fclose(virtual_file);
         ptr = strtok(NULL, "\r\n"); // split the str into tokens with '\n' deliminiter
     }
 
-    write(pipeID, result, SIZE + 1); // writes output string to the pipe
+    write(pipe_ID, result, SIZE + 1); // writes output string to the pipe
 }
 
-void pipe_to_file(int pipeID) {
+//Creates a pipe path to the output 
+void pipe_to_file(int pipe_ID) {
     char result[SIZE];
-    read(pipeID, result, SIZE);
+    read(pipe_ID, result, SIZE);
 
     FILE *output_file = fopen(OUTPUT_FILE_NAME, "w");
     char *ptr = strtok(result, "\r\n");
+    //While ptr exists
     while (ptr) {
+        //Sends text within pipe to the file
         fprintf(output_file, "%s\n", ptr);
         ptr = strtok(NULL, "\r\n");
     }
-
+    //close opened file
     fclose(output_file);
 }
