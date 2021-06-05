@@ -47,9 +47,10 @@ int main(int argc, char *args[])
 
     shm_fd = shm_open(SHM_FILE_NAME, O_CREAT | O_RDWR, 0666);
 
-    // Opening the shared memory
+    // An error occured
     if (shm_fd < 0){
-        printf("**ERROR** Shared Memory failed to open");
+        printf("**ERROR** Shared Memory failed to open\n");
+        exit(-1);
     }
 
     // Configures the size if the shared memory
@@ -58,8 +59,9 @@ int main(int argc, char *args[])
     // Memory mapping the shared memory object
     shm_ptr = mmap(0, SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
     
+    // An error occured
     if (shm_ptr == MAP_FAILED){
-        printf("Map failed\n");
+        printf("**ERROR** Map failed\n");
         exit(-1);
     }
 
@@ -83,28 +85,33 @@ int main(int argc, char *args[])
     }
     else if (child_process_id == -1){  
         printf("**ERROR** Creation of the child process has failed");
+        exit(-1);
     }else{
          // printf("Start of the parent process\n");
     }
+    return(0);
 }
 
 // Reads the sample_in.txt file
 void readFile(char *shm_ptr, char* fileName, int file_length)
 {
     FILE *fp = fopen(fileName, "r"); // opens file in "read" mode
-    char *line = NULL;
-    size_t len = 0;
+
+    size_t len_of_line = 0;
     ssize_t read;
 
-    // read file to shared memory. line by line.
-    
-    while ((read = getline(&line, &len, fp)) != -1)
+    char *line = NULL;
+
+
+    // read file to shared memory. line by line. 
+    while ((read = getline(&line, &len_of_line, fp)) != -1) //Theres a line that can be read
     {
         shm_ptr += sprintf(shm_ptr, "%s", line);
     }
 }
 
-
+/*
+*/
 void exec_cmds_from_shm(char *memory_pointer) {
     char *ptr = memory_pointer;
 
@@ -164,7 +171,8 @@ void writeOutput(char *command, char *output)
     fclose(fp);
 }
 
-
+/*
+*/
 void write_cmds_output_to_pipe(char *ptr, int pipeID) {
     char result[SIZE];
     while (ptr) {
