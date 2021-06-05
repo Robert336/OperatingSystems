@@ -6,7 +6,8 @@
     Date: 2021-06-02 (YYYY-MM-DD)
 
     GENERAL OBJECTIVE
-        
+        This kills the zombie process that was created by running the 'kill' system
+        command with appropriate flags.
     
     ************************************************************************************
 */
