@@ -183,7 +183,7 @@ void write_cmds_output_to_pipe(char *ptr, int pipe_ID) {
         if (virtual_file) {
             char first_line[50];
             //Sends formatted output to ptr
-            sprintf(first_line, "The output of: %s : is\n>>>>>>>>>>>>>>>\n", ptr);
+            sprintf(first_line, "\nThe output of: %s : is\n>>>>>>>>>>>>>>>\n", ptr);
             strcat(result, first_line);
 
             // get the contents of each line of the pipe (virtual file)
