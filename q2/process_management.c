@@ -136,7 +136,7 @@ void exec_cmds_from_shm(char *memory_pointer) {
         int status;
         wait(&status);
         if (WEXITSTATUS(status) == -1) {
-            perror("\n**ERROR**: Error while waiting\n");
+            perror("\n**ERROR** waiting\n");
             exit(-1);
         }
         // Creates a connection from one end of the pipe to the file
@@ -146,7 +146,7 @@ void exec_cmds_from_shm(char *memory_pointer) {
     }
 
     else {
-        printf("\n**ERROR**: Error while forking\n");
+        printf("\n**ERROR** While forking\n");
         exit(-1);
     }
 }
@@ -195,7 +195,7 @@ void write_cmds_output_to_pipe(char *ptr, int pipe_ID) {
             strcat(result, "<<<<<<<<<<<<<<<"); // marks end of output
 
         } else {
-            printf("\n**ERROR**: Error while executing '%s'!\n", ptr);
+            printf("\n**ERROR** executing '%s'!\n", ptr);
             exit(-1);
         }
         
