@@ -1,7 +1,18 @@
   
-/*  OS Assignment 1 Q2
+/*  ************************************************************************************
+    Operating Systems 
+    Assignment 1 | Question 2
+    
     Authors: Robert, Jagveer
     Date: 2021-06-02 (YYYY-MM-DD)
+
+    GENERAL OBJECTIVE
+        create child process to get linux coommands from file and store in shared memory
+        contents of the shared memory. create another child process to execute these 
+        commands and send the output through a pipe parent process with read data 
+        from the pipe and write the commands and outputs to a text file.
+    
+    ************************************************************************************
 */
 
 #include <unistd.h>
@@ -25,18 +36,13 @@ void pipe_to_file(int pipeID);
 
 const int SIZE = 4096; // arbitrary size to acomedate Strings being read from the file
 const char *SHM_FILE_NAME = "SHM_FILE";     // Name of the shared memory obejct
-const char *OUTPUT_FILE_NAME = "output.txt";
+const char *OUTPUT_FILE_NAME = "output.txt"; // name of the output file
 
 int main(int argc, char *args[])
 {
     printf("Start of the parent process\n");
 
-    /* GENERAL OBJECTIVE
-        create child process to get linux coommands from file and store in shared memory
-        contents of the shared memory will be copied to dynamically allocated array
-        create another child process to execute these commands and send the output through a pipe
-        parent process with read data from the pipe and write the commands and outputs to a text file
-    */
+    
     // Shared memory file decriptor
     int shm_fd;
 
@@ -79,7 +85,7 @@ int main(int argc, char *args[])
         munmap(shm_ptr, SIZE);
         //unlink shared memory
         shm_unlink(SHM_FILE_NAME);
-        
+
         exit(0);
     }
     else if (child_pid == -1)
