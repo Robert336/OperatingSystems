@@ -1,4 +1,3 @@
-  
 /*  ************************************************************************************
     Operating Systems 
     Assignment 1 | Question 2
@@ -33,16 +32,13 @@ void exec_cmds_from_shm(char *memory_pointer);
 void write_cmds_output_to_pipe(char *ptr, int pipeID);
 void pipe_to_file(int pipeID);
 
-
+/* List of various constants used within the program */
 const int SIZE = 4096; // arbitrary size to acomedate Strings being read from the file
 const char *SHM_FILE_NAME = "SHM_FILE";     // Name of the shared memory obejct
 const char *OUTPUT_FILE_NAME = "output.txt"; // name of the output file
 
 int main(int argc, char *args[])
 {
-    printf("Start of the parent process\n");
-
-    
     // Shared memory file decriptor
     int shm_fd;
 
@@ -52,9 +48,8 @@ int main(int argc, char *args[])
     shm_fd = shm_open(SHM_FILE_NAME, O_CREAT | O_RDWR, 0666);
 
     // Opening the shared memory
-    if (shm_fd < 0)
-    {
-        printf("shared memory failed to open");
+    if (shm_fd < 0){
+        printf("**ERROR** Shared Memory failed to open");
     }
 
     // Configures the size if the shared memory
@@ -63,21 +58,19 @@ int main(int argc, char *args[])
     // Memory mapping the shared memory object
     shm_ptr = mmap(0, SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
     
-    if (shm_ptr == MAP_FAILED)
-    {
+    if (shm_ptr == MAP_FAILED){
         printf("Map failed\n");
         exit(-1);
     }
 
-    // takes the command line argument
+    // takes the command line argument (AS MENTIONED IN LECTURE args[0] cannot be read)
     char *filename = args[1];
 
     // Child process to read from file
-    int child_pid = fork(); // creating child process
+    int child_process_id = fork(); // creating child process
 
-    if (child_pid == 0)
-    {
-        printf("this is a child process");
+    if (child_process_id == 0){
+        // printf("this is a child process");
         readFile(shm_ptr, filename, strlen(filename));
         exec_cmds_from_shm(shm_ptr);
 
@@ -88,14 +81,15 @@ int main(int argc, char *args[])
 
         exit(0);
     }
-    else if (child_pid == -1)
-    {
-        printf("Child process failed");
+    else if (child_process_id == -1){  
+        printf("**ERROR** Creation of the child process has failed");
+    }else{
+         // printf("Start of the parent process\n");
     }
 }
 
 // Reads the sample_in.txt file
-void readFile(char *shm_ptr, char* fileName, int length)
+void readFile(char *shm_ptr, char* fileName, int file_length)
 {
     FILE *fp = fopen(fileName, "r"); // opens file in "read" mode
     char *line = NULL;
@@ -158,15 +152,15 @@ void writeOutput(char *command, char *output)
     // open file in writing mode
     fp = fopen("output.txt", "w");
 
-    if (fp == NULL)
-    {
-        printf("ERROR >>> file ptr is NULL");
+    if (fp == NULL){
+        printf("***ERROR*** File Pointer is NULL");
     }
 
     /* Complete code to save the commands in a output.txt*/
     fprintf(fp, "The output of: %s : is\n", command);
     fprintf(fp, ">>>>>>>>>>>>>>>\n%s<<<<<<<<<<<<<<<\n", output);
 
+    //Once file is written to it closes
     fclose(fp);
 }
 
@@ -189,8 +183,7 @@ void write_cmds_output_to_pipe(char *ptr, int pipeID) {
             strcat(result, "<<<<<<<<<<<<<<<");
 
         } else {
-            printf("\nexecute_commands: Error while executing '%s'!\n",
-                   ptr);
+            printf("\nexecute_commands: Error while executing '%s'!\n", ptr);
             exit(-1);
         }
 
