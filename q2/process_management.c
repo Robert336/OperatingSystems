@@ -168,19 +168,20 @@ void writeOutput(char *command, char *output)
 void write_cmds_output_to_pipe(char *ptr, int pipeID) {
     char result[SIZE];
     while (ptr) {
-        FILE *virtual_file = popen(ptr, "r");
+        FILE *virtual_file = popen(ptr, "r"); // opening pipe file in read
         char line[1035];
         if (virtual_file) {
             char first_line[50];
             sprintf(first_line, "The output of: %s : is\n>>>>>>>>>>>>>>>\n", ptr);
             strcat(result, first_line);
 
+            // get the contents of each line of the pipe (virtual file)
             while (fgets(line, sizeof(line), virtual_file) != NULL) {
                 strcat(line, "\n");
-                strcat(result, line);
+                strcat(result, line); // append to the overall output string
             }
 
-            strcat(result, "<<<<<<<<<<<<<<<");
+            strcat(result, "<<<<<<<<<<<<<<<"); // marks end of output
 
         } else {
             printf("\nexecute_commands: Error while executing '%s'!\n", ptr);
@@ -188,10 +189,10 @@ void write_cmds_output_to_pipe(char *ptr, int pipeID) {
         }
 
         fclose(virtual_file);
-        ptr = strtok(NULL, "\r\n");
+        ptr = strtok(NULL, "\r\n"); // split the str into tokens with '\n' deliminiter
     }
 
-    write(pipeID, result, SIZE + 1);
+    write(pipeID, result, SIZE + 1); // writes output string to the pipe
 }
 
 void pipe_to_file(int pipeID) {
