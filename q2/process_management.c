@@ -75,6 +75,11 @@ int main(int argc, char *args[])
         readFile(shm_ptr, filename, strlen(filename));
         exec_cmds_from_shm(shm_ptr);
 
+        //unmap shared memory
+        munmap(shm_ptr, SIZE);
+        //unlink shared memory
+        shm_unlink(SHM_FILE_NAME);
+        
         exit(0);
     }
     else if (child_pid == -1)
