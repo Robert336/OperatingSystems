@@ -15,7 +15,7 @@ int get_new_memory_id();
 char *get_memory_pointer(int memory_id);
 void write_file_to_memory(char *memory_pointer, char *fileName, int length);
 void exec_commands_from_memory(char *memory_pointer);
-void write_command_output_to_pipe(char *pointer, int pipe_id);
+void write_cmds_output_to_pipe(char *pointer, int pipe_id);
 void pipe_to_file(int pipe_id);
 
 const int SHARED_MEMORY_SIZE = 4096;
@@ -37,7 +37,8 @@ int main(int argc, char *args[]) {
         exit(-1);
     }
 }
-
+    // shared_mem_id = shm_fd
+    // SHARED_MEMORY_FILE_NAME = SHM_FILE_NAME
 int get_new_memory_id() {
     int shared_mem_id =
         shm_open(SHARED_MEMORY_FILE_NAME, O_CREAT | O_RDWR, 0666);
@@ -112,7 +113,7 @@ void exec_commands_from_memory(char *memory_pointer) {
         }
 
         char *result_pointer = strtok(result, "\r\n");
-        write_command_output_to_pipe(result_pointer, pipe_id);
+        write_cmds_output_to_pipe(result_pointer, pipe_id);
         close(pipe_id);
     }
 
@@ -135,7 +136,7 @@ void exec_commands_from_memory(char *memory_pointer) {
     }
 }
 
-void write_command_output_to_pipe(char *pointer, int pipe_id) {
+void write_cmds_output_to_pipe(char *pointer, int pipe_id) {
     char result[SHARED_MEMORY_SIZE];
     while (pointer) {
         FILE *virtual_file = popen(pointer, "r");
