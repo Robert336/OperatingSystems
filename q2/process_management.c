@@ -127,8 +127,8 @@ void exec_cmds_from_shm(char *memory_pointer) {
             strncat(result, &data, 1);
         }
 
-        char *result_pointer = strtok(result, "\r\n"); // 
-        write_cmds_output_to_pipe(result_pointer, pipeID);
+        char *result_ptr = strtok(result, "\r\n"); // 
+        write_cmds_output_to_pipe(result_ptr, pipeID);
         close(pipeID);
     }
 
