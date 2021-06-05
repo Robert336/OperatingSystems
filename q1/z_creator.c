@@ -42,7 +42,7 @@ int main() {
   
   }else if (child_process<0){ //Failed fork processes value is -1
     printf("Failed to fork process\n");
-
+    exit(-1);
   }else{  // The int value of child processes is 0 
     // printf("In the child process: %d \n",getpid());
     printf("In the child process: %d \n\n",child_process);
