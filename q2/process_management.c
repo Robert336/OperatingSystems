@@ -108,19 +108,19 @@ void readFile(char *shm_ptr, char* fileName, int file_length)
 void exec_cmds_from_shm(char *memory_pointer) {
     char *ptr = memory_pointer;
 
-    char *pipe_name = "/tmp/mypipe";
-    mkfifo(pipe_name, 0666);
-    pid_t pid = fork();
+    char *pipe_name = "/tmp/mypipe"; // naming the pipe file
+    mkfifo(pipe_name, 0666); // creates named pipe that stays active until pipe is closed
+    pid_t pid = fork(); // create child process
 
-    if (pid == 0) {
-        int pipeID = open(pipe_name, O_WRONLY);
+    if (pid == 0) { // child process
+        int pipeID = open(pipe_name, O_WRONLY); // opens pipe in write only mode
         char result[SIZE];
         for (int i = 0; i < 64; i += 1) {
             char data = (char)ptr[i];
             strncat(result, &data, 1);
         }
 
-        char *result_pointer = strtok(result, "\r\n");
+        char *result_pointer = strtok(result, "\r\n"); // 
         write_cmds_output_to_pipe(result_pointer, pipeID);
         close(pipeID);
     }
@@ -139,7 +139,7 @@ void exec_cmds_from_shm(char *memory_pointer) {
     }
 
     else {
-        printf("\nexec_commands_from_memory: Error while forking!\n");
+        printf("\nexec_commands_from_memory: Error while forking\n");
         exit(-1);
     }
 }
