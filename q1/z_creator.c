@@ -6,7 +6,8 @@
     Date: 2021-06-02 (YYYY-MM-DD)
 
     GENERAL OBJECTIVE
-        
+        This file creates and turns a child process into a zombie process. Z-creator
+        is used as a helper file for z_terminator.
     
     ************************************************************************************
 */
