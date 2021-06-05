@@ -95,7 +95,7 @@ void readFile(char *shm_ptr, char* fileName, int len)
     
     while ((read = getline(&line, &len, fileName)) != -1)
     {
-        ptr += sprintf(ptr, "%s", line);
+        shm_ptr += sprintf(shm_ptr, "%s", line);
     }
 }
 
