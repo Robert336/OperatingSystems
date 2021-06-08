@@ -1,4 +1,4 @@
-# CP386 - Operating Systems Assignment 1
+# CP386 - Operating Systems Assignment
 
 Contributors
 - [Robert Mazza](https://github.com/Robert336)
