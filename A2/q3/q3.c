@@ -114,7 +114,7 @@ int readFile(char* fileName, Thread** threads)//use this method in a suitable wa
 
 		}
 
-		// add the newly create thread to the collection of threads (threads array)
+		// add the newly created thread to the collection of threads (threads array)
 		threads[k] = newThread;
 	}
 	return threadCount;
