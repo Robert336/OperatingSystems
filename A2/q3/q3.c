@@ -30,8 +30,16 @@ int main(int argc, char *argv[])
 		printf("Input file name missing...exiting with error code -1\n");
 		return -1;
 	}
+	
+	// takes commmand line argument
+	char *filename = args[1];
 
-    //you can add some suitable code here as per problem sepcification
+	Thread* threads; // array of threads (size is determined in the readFile function)
+	int threadCount = readFile( filename, *threads); // creates the array of threads and returns the count
+
+	
+
+
 
 	while()//put a suitable condition here to run your program
 	{
@@ -95,7 +103,7 @@ int readFile(char* fileName, Thread** threads)//use this method in a suitable wa
 		while(token!=NULL) //this loop tokenizes each line of input file
 		{
 			
-			printf("TOKEN == %s", token); // debug
+			printf("TOKEN == %s", token); // **COMMENT THIS LINE WHEN FINISHED**
 			
 			// check which value is currently the token
 			// Options are: tID, starttime, or lifetime
