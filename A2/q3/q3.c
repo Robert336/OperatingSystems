@@ -16,7 +16,8 @@ time_t programClock;//the global timer/clock for the program
 typedef struct thread //represents a single thread
 {
 	char tid[4];//id of the thread as read from file
-//add more members here as per requirement
+	int startTime;
+	int lifetime;
 } Thread;
 
 void* threadRun(void* t);//the thread function, the code executed by each thread
@@ -91,11 +92,30 @@ int readFile(char* fileName, Thread** threads)//use this method in a suitable wa
 		char* token = NULL;
 		int j = 0;
 		token =  strtok(lines[k],";");
-		while(token!=NULL)
+		while(token!=NULL) //this loop tokenizes each line of input file
 		{
-			//this loop tokenizes each line of input file
-			//write your code here to populate instances of Thread to build a collection
+			
+			printf("TOKEN == %s", token); // debug
+			
+			// check which value is currently the token
+			// Options are: tID, starttime, or lifetime
+			
+			if (j == 0){
+				Thread *newThread = (*Thread) malloc(sizeof(Thread));
+			} else if (j == 1){
+				newThread->tid = token;
+			} else if (j == 2){
+				newThread->starttime = token;
+			} else {
+				newThread->lifetime = token;
+			}
+			token = strtok(NULL, ";");
+			j++;
+
 		}
+
+		// add the newly create thread to the collection of threads (threads array)
+		threads[k] = newThread;
 	}
 	return threadCount;
 }
