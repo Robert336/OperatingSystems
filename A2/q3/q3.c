@@ -15,9 +15,9 @@ time_t programClock;//the global timer/clock for the program
 
 typedef struct thread //represents a single thread
 {
-	char tid[4];//id of the thread as read from file
-	int startTime;
-	int lifetime;
+	char tid[4]; // id of the thread as read from file
+	int start_time; // the start time at which the thread starts
+	int lifetime; // the total span of time the thread will be active for
 } Thread;
 
 void* threadRun(void* t);//the thread function, the code executed by each thread
@@ -99,13 +99,13 @@ int readFile(char* fileName, Thread** threads)//use this method in a suitable wa
 			
 			// check which value is currently the token
 			// Options are: tID, starttime, or lifetime
-			
+
 			if (j == 0){
 				Thread *newThread = (*Thread) malloc(sizeof(Thread));
 			} else if (j == 1){
 				newThread->tid = token;
 			} else if (j == 2){
-				newThread->starttime = token;
+				newThread->start_time = token;
 			} else {
 				newThread->lifetime = token;
 			}
