@@ -5,6 +5,7 @@
 #include <pthread.h>
 #include <sys/stat.h>
 #include <time.h>
+#include <stdbool.h>
 
 typedef struct thread //represents a single thread
 {
@@ -17,7 +18,7 @@ typedef struct thread //represents a single thread
 } Thread;
 
 void* threadRun(Thread* t);//the thread function, the code executed by each thread
-int readFile(char* fileName, Thread *threads);//function to read the file content and build array of threads
+int readFile(char* fileName, Thread** threads);//function to read the file content and build array of threads
 void logStart(char* tID);//function to log that a new thread is is_running
 void logFinish(char* tID);//function to log that a thread has finished its time
 pthread_t create_thread(Thread *thread); // creates new thread
@@ -35,7 +36,9 @@ int main(int argc, char *argv[])
 	}
 	
 	// takes commmand line argument
-	char *filename = argv[1];
+	printf("This is working0");
+	char* filename = argv[1];	
+	printf("This is working1");
 
 	Thread *threads = malloc(sizeof(*threads)); // array of threads (size is determined in the readFile function)
 	int threadCount = readFile(filename, threads); // creates the array of threads and returns the count
@@ -50,25 +53,32 @@ int main(int argc, char *argv[])
         for (int i = 0; i < threadCount; i++) {
             Thread thread = threads[i];
             // time_t now = time(NULL);
+			printf("This is working2");
 			
             if (!thread.is_running && getCurrentTime() == thread.start_time) {
 				threads[i].is_running = 1; // thread is running!
                 completed_t++;
                 pthread_t t_id = create_thread(&threads[i]);
                 threads[i].t_id = t_id;
+				printf("This is working3");
+
             }
         }
     }
 
     for (int i = 0; i < threadCount; i++){
         pthread_join(threads[i].t_id, NULL);
+		printf("This is working4");
+
 	}
 	free(threads);
+	printf("This is working5");
+
 	return 0;
 }
 
 //use this method in a suitable way to read file
-int readFile(char* fileName, Thread *threads){
+int readFile(char* fileName, Thread** threads){
 	FILE *in = fopen(fileName, "r");
 	if(!in)
 	{
@@ -147,9 +157,10 @@ int readFile(char* fileName, Thread *threads){
 		// add the newly created thread to the collection of threads (threads array)
 		threads1[k] = *newThread;
 	}
-	return threadCount;
+	// return threadCount;
 }
-return 0;
+// return 0;
+return threadCount;
 }
 
 void logStart(char* tID)//invoke this method when you start a thread
@@ -190,6 +201,7 @@ void startClock()//invoke this method when you start servicing threads
 
 long getCurrentTime()//invoke this method whenever you want to check how much time units passed since you invoked startClock()
 {
-	time_t now = time(NULL);
-	return abs(now - time(NULL));
+	time_t now;
+	now = time(NULL);
+	return now-programClock;
 }
