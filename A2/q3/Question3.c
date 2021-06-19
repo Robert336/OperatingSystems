@@ -183,7 +183,7 @@ void *threadRun(Thread *t) // thread starting routine
 	sleep(t->lifetime);
 	logFinish(t->tid);
 	// exit thread at the end of it's lifetime
-	exit(0);
+	return NULL;
 }
 
 pthread_t create_thread(Thread *thread)
