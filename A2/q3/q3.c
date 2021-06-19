@@ -6,11 +6,13 @@
 #include <sys/stat.h>
 #include <time.h>
 
-void logStart(char* tID);//function to log that a new thread is started
+void* threadRun(void* t);//the thread function, the code executed by each thread
+int readFile(char* fileName, Thread** threads);//function to read the file content and build array of threads
+void logStart(char* tID);//function to log that a new thread is is_running
 void logFinish(char* tID);//function to log that a thread has finished its time
-
+pthread_t create_thread(Thread* thread); // creates new thread
 void startClock();//function to start program clock
-long getCurrentTime();//function to check current time since clock was started
+long getCurrentTime();//function to check current time since clock was is_running
 time_t programClock;//the global timer/clock for the program
 
 typedef struct thread //represents a single thread
@@ -18,10 +20,10 @@ typedef struct thread //represents a single thread
 	char tid[4]; // id of the thread as read from file
 	int start_time; // the start time at which the thread starts
 	int lifetime; // the total span of time the thread will be active for
-} Thread;
+	int is_running; // tracking the state of the thread
+	pthread_t t_id; // proper thread id
 
-void* threadRun(void* t);//the thread function, the code executed by each thread
-int readFile(char* fileName, Thread** threads);//function to read the file content and build array of threads
+} Thread;
 
 int main(int argc, char *argv[])
 {
@@ -36,20 +38,36 @@ int main(int argc, char *argv[])
 
 	Thread* threads; // array of threads (size is determined in the readFile function)
 	int threadCount = readFile( filename, *threads); // creates the array of threads and returns the count
-
 	
+	startClock();
+	// printf("Times a tickin'! (clock is_running)");
 
+	int completed_t = 0;
 
+    programClock = time(NULL);
+    while (completed_t < threadCount) {
+        for (int i = 0; i < threadCount; i++) {
+            Thread thread = threads[i];
+            time_t now = time(NULL);
 
-	while()//put a suitable condition here to run your program
-	{
-	    //write suitable code here to run the threads
+            if (!thread.is_running && getCurrentTime() == thread.start_time) {
+                completed_t++;
+                pthread_t t_id = create_thread(&threads[i]);
+				threads[i].is_running = 1; // thread is running!
+                threads[i].t_id = t_id;
+            }
+        }
+    }
+
+    for (int i = 0; i < threadCount; i++){
+        pthread_join(threads[i].t_id, NULL);
 	}
+
 	return 0;
 }
 
-int readFile(char* fileName, Thread** threads)//use this method in a suitable way to read file
-{
+//use this method in a suitable way to read file
+int readFile(char* fileName, Thread** threads){
 	FILE *in = fopen(fileName, "r");
 	if(!in)
 	{
@@ -100,23 +118,26 @@ int readFile(char* fileName, Thread** threads)//use this method in a suitable wa
 		char* token = NULL;
 		int j = 0;
 		token =  strtok(lines[k],";");
+		
+		Thread *newThread = (*Thread) malloc(sizeof(Thread));
+
 		while(token!=NULL) //this loop tokenizes each line of input file
 		{
 			
-			printf("TOKEN == %s", token); // **COMMENT THIS LINE WHEN FINISHED**
+			//printf("TOKEN == %s", token); // **COMMENT THIS LINE WHEN FINISHED**
 			
 			// check which value is currently the token
 			// Options are: tID, starttime, or lifetime
 
 			if (j == 0){
-				Thread *newThread = (*Thread) malloc(sizeof(Thread));
+				strcpy(newThread.tid, token);
 			} else if (j == 1){
-				newThread->tid = token;
-			} else if (j == 2){
-				newThread->start_time = token;
+				newThread->start_time = atoi(token);
 			} else {
-				newThread->lifetime = token;
-			}
+				newThread->lifetime = atoi(token);
+				newThread->is_running = 0; // start false
+			
+
 			token = strtok(NULL, ";");
 			j++;
 
@@ -130,7 +151,7 @@ int readFile(char* fileName, Thread** threads)//use this method in a suitable wa
 
 void logStart(char* tID)//invoke this method when you start a thread
 {
-	printf("[%ld] New Thread with ID %s is started.\n", getCurrentTime(), tID);
+	printf("[%ld] New Thread with ID %s is is_running.\n", getCurrentTime(), tID);
 }
 
 void logFinish(char* tID)//invoke this method when a thread is over
@@ -138,9 +159,21 @@ void logFinish(char* tID)//invoke this method when a thread is over
 	printf("[%ld] Thread with ID %s is finished.\n", getCurrentTime(), tID);
 }
 
-void* threadRun(void* t)//implement this function in a suitable way
+void* threadRun(Thread* t) // thread starting routine
 {
-	// your code here
+	logStart(t->tid);
+	sleep(t->lifetime);
+	logFinish(t->tid);
+	// exit thread at the end of it's lifetime
+}
+
+pthread_t create_thread(Thread* thread) {
+    pthread_t t_id;
+    pthread_attr_t thread_attrib;
+    int status;
+    status = pthread_attr_init(&thread_attrib);
+    status = pthread_create(&t_id, &thread_attrib, (void*)&thread_run, thread);
+    return t_id;
 }
 
 void startClock()//invoke this method when you start servicing threads
@@ -152,5 +185,5 @@ long getCurrentTime()//invoke this method whenever you want to check how much ti
 {
 	time_t now;
 	now = time(NULL);
-	return now-programClock;
+	return abs(now-programClock);
 }
