@@ -6,15 +6,6 @@
 #include <sys/stat.h>
 #include <time.h>
 
-void* threadRun(void* t);//the thread function, the code executed by each thread
-int readFile(char* fileName, Thread** threads);//function to read the file content and build array of threads
-void logStart(char* tID);//function to log that a new thread is is_running
-void logFinish(char* tID);//function to log that a thread has finished its time
-pthread_t create_thread(Thread* thread); // creates new thread
-void startClock();//function to start program clock
-long getCurrentTime();//function to check current time since clock was is_running
-time_t programClock;//the global timer/clock for the program
-
 typedef struct thread //represents a single thread
 {
 	char tid[4]; // id of the thread as read from file
@@ -25,6 +16,16 @@ typedef struct thread //represents a single thread
 
 } Thread;
 
+void* threadRun(void* t);//the thread function, the code executed by each thread
+int readFile(char* fileName, Thread** threads);//function to read the file content and build array of threads
+void logStart(char* tID);//function to log that a new thread is is_running
+void logFinish(char* tID);//function to log that a thread has finished its time
+pthread_t create_thread(Thread* thread); // creates new thread
+void startClock();//function to start program clock
+long getCurrentTime();//function to check current time since clock was is_running
+time_t programClock;//the global timer/clock for the program
+
+
 int main(int argc, char *argv[])
 {
 	if(argc<2)
@@ -34,10 +35,10 @@ int main(int argc, char *argv[])
 	}
 	
 	// takes commmand line argument
-	char *filename = args[1];
+	char *filename = argv[1];
 
 	Thread* threads; // array of threads (size is determined in the readFile function)
-	int threadCount = readFile( filename, *threads); // creates the array of threads and returns the count
+	int threadCount = readFile( filename, threads); // creates the array of threads and returns the count
 	
 	startClock();
 	// printf("Times a tickin'! (clock is_running)");
@@ -119,7 +120,7 @@ int readFile(char* fileName, Thread** threads){
 		int j = 0;
 		token =  strtok(lines[k],";");
 		
-		Thread *newThread = (*Thread) malloc(sizeof(Thread));
+		Thread *newThread =  malloc(sizeof(Thread));
 
 		while(token!=NULL) //this loop tokenizes each line of input file
 		{
@@ -130,7 +131,7 @@ int readFile(char* fileName, Thread** threads){
 			// Options are: tID, starttime, or lifetime
 
 			if (j == 0){
-				strcpy(newThread.tid, token);
+				strcpy(newThread->tid, token);
 			} else if (j == 1){
 				newThread->start_time = atoi(token);
 			} else {
