@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
 {
 
     int i;
-    pthread_t tid[NUM_THREADS];
+    pthread_t tid;
     pthread_attr_t attr;
     int status;
     //Causes seg fault without this line
@@ -33,7 +33,8 @@ int main(int argc, char *argv[])
      * Creates threads
      * Declaring a variable to create threads  avoids duplication of printf within the if statement
      * */
-    status = pthread_create(&tid[i], &attr, custom_thread, NULL);
+    status = pthread_create(&tid, &attr, custom_thread, NULL);
+    sleep(1);
 
     //    for (i = 0; i < NUM_THREADS; i++)
     // {
@@ -49,9 +50,14 @@ int main(int argc, char *argv[])
             printf("I am the process created by compiler By default\n");
             sleep(1);
         }
-        pthread_join(tid[i], NULL);
+        // Not really needed?
+        pthread_join(tid, NULL);
     }
-
+    else
+    {
+        printf("Error");
+    }
+    return 0;
     // // Joins threads
     // for (i = 0; i < NUM_THREADS; i++)
     // {
@@ -60,11 +66,12 @@ int main(int argc, char *argv[])
     // }
 }
 
-void *custom_thread(void *arg)
+void *custom_thread(void *args)
 {
     for (int i = 0; i < NUM_THREADS; i++)
     {
         printf("I am a Custom Thread Function Created by user.\n");
         sleep(1);
     }
+    exit(0);
 }
