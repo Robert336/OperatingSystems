@@ -190,7 +190,6 @@ void startClock()//invoke this method when you start servicing threads
 
 long getCurrentTime()//invoke this method whenever you want to check how much time units passed since you invoked startClock()
 {
-	time_t now;
-	now = time(NULL);
-	return abs(now-programClock);
+	time_t now = time(NULL);
+	return abs(now - time(NULL));
 }
