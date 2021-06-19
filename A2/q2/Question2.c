@@ -7,7 +7,7 @@
 
 // definintions
 int main(int argc, char *argv[]);
-
+// From discussions we need to sort first?
 int main(int argc, char *argv[])
 {
 
