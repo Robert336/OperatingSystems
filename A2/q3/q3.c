@@ -153,11 +153,13 @@ int readFile(char* fileName, Thread *threads){
 void logStart(char* tID)//invoke this method when you start a thread
 {
 	printf("[%ld] New Thread with ID %s is is_running.\n", getCurrentTime(), tID);
+	return 0;
 }
 
 void logFinish(char* tID)//invoke this method when a thread is over
 {
 	printf("[%ld] Thread with ID %s is finished.\n", getCurrentTime(), tID);
+	return 0;
 }
 
 void *threadRun(Thread *t) // thread starting routine
@@ -165,6 +167,7 @@ void *threadRun(Thread *t) // thread starting routine
 	logStart(t->tid);
 	sleep(t->lifetime);
 	logFinish(t->tid);
+	return 0;
 	// exit thread at the end of it's lifetime
 }
 
@@ -180,6 +183,7 @@ pthread_t create_thread(Thread* thread) {
 void startClock()//invoke this method when you start servicing threads
 {
 	programClock = time(NULL);
+	return 0;
 }
 
 long getCurrentTime()//invoke this method whenever you want to check how much time units passed since you invoked startClock()
