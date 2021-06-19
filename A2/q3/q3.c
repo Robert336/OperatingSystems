@@ -16,11 +16,11 @@ typedef struct thread //represents a single thread
 
 } Thread;
 
-void* threadRun(void* t);//the thread function, the code executed by each thread
-int readFile(char* fileName, Thread** threads);//function to read the file content and build array of threads
+void* threadRun(Thread* t);//the thread function, the code executed by each thread
+int readFile(char* fileName, Thread *threads);//function to read the file content and build array of threads
 void logStart(char* tID);//function to log that a new thread is is_running
 void logFinish(char* tID);//function to log that a thread has finished its time
-pthread_t create_thread(Thread* thread); // creates new thread
+pthread_t create_thread(Thread *thread); // creates new thread
 void startClock();//function to start program clock
 long getCurrentTime();//function to check current time since clock was is_running
 time_t programClock;//the global timer/clock for the program
@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 	// takes commmand line argument
 	char *filename = argv[1];
 
-	Thread* threads; // array of threads (size is determined in the readFile function)
+	Thread *threads; // array of threads (size is determined in the readFile function)
 	int threadCount = readFile( filename, threads); // creates the array of threads and returns the count
 	
 	startClock();
@@ -49,12 +49,12 @@ int main(int argc, char *argv[])
     while (completed_t < threadCount) {
         for (int i = 0; i < threadCount; i++) {
             Thread thread = threads[i];
-            time_t now = time(NULL);
-
+            // time_t now = time(NULL);
+			
             if (!thread.is_running && getCurrentTime() == thread.start_time) {
+				threads[i].is_running = 1; // thread is running!
                 completed_t++;
                 pthread_t t_id = create_thread(&threads[i]);
-				threads[i].is_running = 1; // thread is running!
                 threads[i].t_id = t_id;
             }
         }
@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
 }
 
 //use this method in a suitable way to read file
-int readFile(char* fileName, Thread** threads){
+int readFile(char* fileName, Thread *threads){
 	FILE *in = fopen(fileName, "r");
 	if(!in)
 	{
@@ -100,7 +100,7 @@ int readFile(char* fileName, Thread** threads){
 		threadCount++;
 		command = strtok(NULL,"\r\n");
 	}
-	*threads = (Thread*) malloc(sizeof(Thread)*threadCount);
+	Thread *threads1 =  malloc(sizeof(Thread)*threadCount);
 
 	char* lines[threadCount];
 	command = NULL;
@@ -145,11 +145,11 @@ int readFile(char* fileName, Thread** threads){
 		}
 
 		// add the newly created thread to the collection of threads (threads array)
-		threads[k] = newThread;
+		threads1[k] = *newThread;
 	}
 	return threadCount;
 }
-
+}
 void logStart(char* tID)//invoke this method when you start a thread
 {
 	printf("[%ld] New Thread with ID %s is is_running.\n", getCurrentTime(), tID);
@@ -160,7 +160,7 @@ void logFinish(char* tID)//invoke this method when a thread is over
 	printf("[%ld] Thread with ID %s is finished.\n", getCurrentTime(), tID);
 }
 
-void* threadRun(Thread* t) // thread starting routine
+void *threadRun(Thread *t) // thread starting routine
 {
 	logStart(t->tid);
 	sleep(t->lifetime);
@@ -173,7 +173,7 @@ pthread_t create_thread(Thread* thread) {
     pthread_attr_t thread_attrib;
     int status;
     status = pthread_attr_init(&thread_attrib);
-    status = pthread_create(&t_id, &thread_attrib, (void*)&thread_run, thread);
+    status = pthread_create(&t_id, &thread_attrib, (void*)&threadRun, thread);
     return t_id;
 }
 
