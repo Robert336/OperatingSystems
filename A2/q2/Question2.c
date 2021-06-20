@@ -1,170 +1,186 @@
+#include <string.h>
+#include <errno.h>
+#include <pthread.h>
+#include <sys/wait.h>
+#include <math.h>
 #include <unistd.h>
+#include <sys/types.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <pthread.h>
-#include <sys/stat.h>
 
-// definintions
-int main(int argc, char *argv[]);
-void *thread_avg(struct num_array *nums);
-void *thread_max(struct num_array *nums);
-void *thread_min(struct num_array *nums);
-void *thread_median(struct num_array *nums);
-void sort(int a[], int n);
-void swap(int *p, int *q);
+int MAXVALUE;
+int MINVALUE;
+float AVGVAL;
+float MEDVAL;
+float HALF = 0.5;
+float CUT_HALF = 2.0;
 
-// stats of the list are stored globally
-int max;
-int min;
-float avg;
-float median;
-
-typedef struct num_array
+struct array_nums
 {
-    int length;
+    int len;
     int *nums;
-};
+} Array_nums;
 
-// From discussions we need to sort first?
+void *avg_fn(struct array_nums *array_nums);
+void *max_fn(struct array_nums *array_nums);
+void *min_fn(struct array_nums *array_nums);
+void *median_fn(struct array_nums *array_nums);
+void retrieve_user_parameters(int total_nums, char *the_array[], int target_arr[]);
+
+//Wouldnt work unless its declared before main
+int new_sort(const void *temp1, const void *temp2)
+{
+    int a = *((int *)temp1);
+    int b = *((int *)temp2);
+    if (a > b)
+        return 1;
+    if (b > a)
+        return -1;
+    return 0;
+}
+
+//Wouldnt work unless its declared before main
+void *create_thread(void *function, struct array_nums *array_nums)
+{
+    pthread_t tid;
+    pthread_attr_t thread_attr;
+    int s;
+
+    s = pthread_attr_init(&thread_attr);
+
+    if (s != 0)
+    {
+        printf("**ERROR***\n");
+        // return(-1) gave errors
+        exit(-1);
+    }
+    s = pthread_create(&tid, &thread_attr, function, array_nums);
+
+    if (s != 0)
+    {
+        printf("**ERROR**\n");
+        // return(-1) gave errors
+        exit(-1);
+    }
+    //Allows thread enough time to perform
+    sleep(1);
+
+    return NULL;
+}
+
 int main(int argc, char *argv[])
 {
-    max = 0;
-    min = 0;
-    avg = 0;
-    median = 0;
+    int nums[argc - 1];
 
-    struct num_array arr_nums; // this is the main array with the numbers from the argument line
+    retrieve_user_parameters(argc, argv, nums);
 
-    int nums[argc - 1];         // unsorted args
-    arr_nums.length = argc - 1; // getting the length of the array
+    // Built in sort function within a C library
+    qsort(nums, argc - 1, sizeof(argc - 1), new_sort);
 
-    printf("SIZE OF NUMS (int) == %d\n", arr_nums.length);
+    struct array_nums array_nums;
+    array_nums.len = argc - 1;
+    array_nums.nums = nums;
 
-    // copy the number values from argv to the nums array
-    for (int i = 0; i < arr_nums.length; i++)
+    MAXVALUE = 0;
+    MINVALUE = 0;
+    AVGVAL = 0;
+    MEDVAL = 0;
+
+    create_thread(&avg_fn, &array_nums);
+    create_thread(max_fn, &array_nums);
+    create_thread(min_fn, &array_nums);
+    create_thread(median_fn, &array_nums);
+
+    printf("The average value calculated by the first thread is %0.2f\n", AVGVAL);
+    printf("The maximum value calculated by the second thread is %d\n", MAXVALUE);
+    printf("The minimum value calculated by the third thread is %d\n", MINVALUE);
+    printf("The median value calculated by the fourth thread is %0.2f\n", MEDVAL);
+
+    return 0;
+}
+
+void *max_fn(struct array_nums *array_nums)
+{
+    int len = array_nums->len;
+    int *the_array = array_nums->nums;
+
+    int address = 0;
+
+    for (int i = 0; i < len; i++)
     {
-        char *c;
-        int number = strtol(argv[i + 1], &c, 10);
-        if (c == argv[i + 1])
+        if (the_array[address] < the_array[i])
+            address = i;
+    }
+    MAXVALUE = the_array[address];
+    return NULL;
+}
+
+void *min_fn(struct array_nums *array_nums)
+{
+    int len = array_nums->len;
+    int *the_array = array_nums->nums;
+
+    int address = 0;
+
+    for (int i = 0; i < len; i++)
+    {
+        if (the_array[address] > the_array[i])
+            address = i;
+    }
+    MINVALUE = the_array[address];
+    return NULL;
+}
+
+void *avg_fn(struct array_nums *array_nums)
+{
+    int count = array_nums->len;
+    int *the_array = array_nums->nums;
+
+    int total = 0;
+
+    for (int i = 0; i < count; i++)
+    {
+        total = total + the_array[i];
+    }
+    AVGVAL = total / count;
+    return NULL;
+}
+
+void *median_fn(struct array_nums *array_nums)
+{
+    int len = array_nums->len;
+    int *the_array = array_nums->nums;
+
+    if (len % 2 == 0)
+    {
+        int temp1 = len * HALF;
+        int temp2 = (len - 1) * HALF;
+        MEDVAL = (the_array[temp2] + the_array[temp1]) / CUT_HALF;
+    }
+    else
+    {
+        int address = len * HALF;
+        MEDVAL = (the_array[address]);
+    }
+    return NULL;
+}
+
+void retrieve_user_parameters(int total_nums, char *the_array[], int target_arr[])
+{
+    for (int i = 0; i < total_nums - 1; i++)
+    {
+        char *a;
+        int user_param = strtol(the_array[i + 1], &a, 10);
+
+        if (a == the_array[i + 1])
         {
-            printf("Error -> error converting numbers");
+            printf("**ERROR**\n");
+            // return(-1) gave errors
             exit(-1);
         }
         else
         {
-            nums[i] = number;
-        }
-        printf("nums[%d] == %d\n", i, nums[i]);
-    }
-
-    // sort the array, min -> max
-    sort(nums, argc - 1);
-
-    arr_nums.nums = nums;
-
-    //printf("is dis sorted doe?! %d -> %d\n", nums[0], nums[array_size - 1]);
-
-    pthread_t tid1;
-    pthread_t tid2;
-    pthread_t tid3;
-    pthread_t tid4;
-    pthread_attr_t attr1;
-    pthread_attr_t attr2;
-    pthread_attr_t attr3;
-    pthread_attr_t attr4;
-    int t1 = pthread_attr_init(&attr1);
-    int t2 = pthread_attr_init(&attr2);
-    int t3 = pthread_attr_init(&attr3);
-    int t4 = pthread_attr_init(&attr4);
-
-    if (t1 != 0 || t2 != 0 || t3 != 0 || t4 != 0)
-    {
-        printf("error\n");
-        exit(-1);
-    }
-
-    // starts the thread to calculate the stats
-    t1 = pthread_create(&tid1, &attr1, (void *)thread_avg, &arr_nums);
-    t2 = pthread_create(&tid2, &attr2, (void *)thread_max, &arr_nums);
-    t3 = pthread_create(&tid3, &attr3, (void *)thread_min, &arr_nums);
-    t4 = pthread_create(&tid4, &attr4, (void *)thread_median, &arr_nums);
-
-    pthread_join(tid1, NULL);
-    pthread_join(tid2, NULL);
-    pthread_join(tid3, NULL);
-    pthread_join(tid4, NULL);
-    return 0;
-}
-
-// thread to work on the average
-void *thread_avg(struct num_array *nums)
-{
-    int sum = 0;
-    int count = 0;
-    for (int i = 0; i < nums->length; i++)
-    {
-        printf("nums[i] = %d\n", nums->nums[i]);
-        printf("SUM = %d\n i = %d\n", sum, i);
-        sum = sum + nums->nums[i];
-        count++;
-    }
-    avg = (sum / count);
-}
-
-// thread to work on the max
-void *thread_max(struct num_array *nums)
-{
-    int *ptr = &nums->nums[1];
-    max = ptr - 1;
-    printf(" max %d\n", max);
-}
-
-// thread to work on the min
-void *thread_min(struct num_array *nums)
-{
-    min = nums->nums[0];
-    printf("min %d\n", min);
-}
-
-// thread to work on the median
-void *thread_median(struct num_array *nums)
-{
-    int mid;
-    if (nums->length % 2 == 1)
-    {
-        mid = nums->length / 2 - 1;
-    }
-    else
-    {
-        int mid1, mid2;
-        mid1 = nums->nums[nums->length / 2 - 1];
-        mid2 = nums->nums[nums->length / 2 + 1];
-        median = (mid1 + mid2) / 2;
-    }
-
-    printf("%2f\n", median);
-}
-
-void swap(int *p, int *q)
-{
-    int t;
-
-    t = *p;
-    *p = *q;
-    *q = t;
-}
-
-void sort(int a[], int n)
-{
-    int i, j, temp;
-
-    for (i = 0; i < n - 1; i++)
-    {
-        for (j = 0; j < n - i - 1; j++)
-        {
-            if (a[j] > a[j + 1])
-                swap(&a[j], &a[j + 1]);
+            target_arr[i] = user_param;
         }
     }
 }
