@@ -138,26 +138,6 @@ int readFile(char *fileName, Thread **threads)
 
 	for (int k = 0; k < threadCount; k++)
 	{
-		// while(token!=NULL) //this loop tokenizes each line of input file
-		// {
-		// 	printf("%d\n", j);
-
-		// 	//printf("TOKEN == %s", token); // **COMMENT THIS LINE WHEN FINISHED**
-
-		// 	// check which value is currently the token
-		// 	// Options are: tID, starttime, or lifetime
-
-		// 	if (j == 0){
-		// 		strcpy(newThread->tid, token);
-		// 	} else if (j == 1){
-		// 		newThread->start_time = atoi(token);
-		// 	} else {
-		// 		newThread->lifetime = atoi(token);
-		// 		newThread->is_running = 0; // start false
-		// 	token = strtok(NULL, ";");
-		// 	j++;
-
-		// }
 
 		char *token = strtok(lines[k], ";");
 		char *tid = token;
