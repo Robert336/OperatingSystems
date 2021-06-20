@@ -6,8 +6,7 @@
     Date: 2021-06-19 (YYYY-MM-DD)
 
     GENERAL OBJECTIVE
-        
-    
+    Demonstrating the ambiguity of the order of exectution of print statements from threads
     ************************************************************************************
 */
 
@@ -28,7 +27,7 @@ void *custom_thread(void *arg);
 
 /* Answer to question asked on the assignment instruction sheet:
 * 
-*Yes we do notice ambiguity in the order of the printed statments of the output of the program
+*YES! we do notice ambiguity in the order of the printed statments of the output of the program
 */
 int main(int argc, char *argv[])
 {
@@ -37,13 +36,13 @@ int main(int argc, char *argv[])
     // Defined thread variables
     pthread_t tid;
     pthread_attr_t attr;
-    int status;
+    int s;
     //Causes seg fault without this line
     //Retrieves process thread attribute
-    status = pthread_attr_init(&attr);
+    s = pthread_attr_init(&attr);
 
     // Error testing:
-    if (status != 0)
+    if (s != 0)
     {
         printf("**Error**");
         return -1;
@@ -55,12 +54,12 @@ int main(int argc, char *argv[])
      * Creates threads
      * Declaring a variable to create the threads avoids duplication of printf within the if statement
      * */
-    status = pthread_create(&tid, &attr, custom_thread, NULL);
+    s = pthread_create(&tid, &attr, custom_thread, NULL);
     // Puts the thread to sleep for 1 second
     sleep(1);
 
     // Thread is created successfully
-    if (status == 0)
+    if (s == 0)
     {
         printf("Custom thread created successfully\n");
 

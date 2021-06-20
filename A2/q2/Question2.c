@@ -1,3 +1,15 @@
+/*  ************************************************************************************
+    Operating Systems 
+    Assignment 2 | Question 2
+    
+    Authors: Robert, Jagveer
+    Date: 2021-06-19 (YYYY-MM-DD)
+
+    GENERAL OBJECTIVE
+    Using multi-threading to complete differnt task at the same time.
+    ************************************************************************************
+*/
+
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>

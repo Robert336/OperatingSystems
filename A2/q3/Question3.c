@@ -1,13 +1,12 @@
 /*  ************************************************************************************
     Operating Systems 
-    Assignment 2 | Question 1
+    Assignment 2 | Question 3
     
     Authors: Robert, Jagveer
     Date: 2021-06-19 (YYYY-MM-DD)
 
     GENERAL OBJECTIVE
-        
-    
+    Creating different threads at different times, with different life spans.
     ************************************************************************************
 */
 
