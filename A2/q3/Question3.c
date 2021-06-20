@@ -1,3 +1,17 @@
+/*  ************************************************************************************
+    Operating Systems 
+    Assignment 2 | Question 1
+    
+    Authors: Robert, Jagveer
+    Date: 2021-06-19 (YYYY-MM-DD)
+
+    GENERAL OBJECTIVE
+        
+    
+    ************************************************************************************
+*/
+
+// C libraries included within file
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
