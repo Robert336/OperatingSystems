@@ -6,8 +6,7 @@
     Date: 2021-06-19 (YYYY-MM-DD)
 
     GENERAL OBJECTIVE
-        
-    
+    Demonstrating the ambiguity of the order of exectution of print statements from threads
     ************************************************************************************
 */
 

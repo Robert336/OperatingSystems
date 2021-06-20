@@ -1,13 +1,12 @@
 /*  ************************************************************************************
     Operating Systems 
-    Assignment 2 | Question 1
+    Assignment 2 | Question 3
     
     Authors: Robert, Jagveer
     Date: 2021-06-19 (YYYY-MM-DD)
 
     GENERAL OBJECTIVE
-        
-    
+    Creating different threads at different times, with different life spans.
     ************************************************************************************
 */
 
@@ -21,6 +20,7 @@
 #include <time.h>
 #include <stdbool.h>
 
+//Structure declaration to help with threading
 typedef struct thread //represents a single thread
 {
 	char tid[4];	// id of the thread as read from file
@@ -31,6 +31,8 @@ typedef struct thread //represents a single thread
 
 } Thread;
 
+//All function declarations
+//Don't forget to declare main again
 int main(int argc, char *argv[]);
 void *threadRun(Thread *t);						//the thread function, the code executed by each thread
 int readFile(char *fileName, Thread **threads); //function to read the file content and build array of threads
@@ -43,9 +45,10 @@ time_t programClock;							//the global timer/clock for the program
 
 int main(int argc, char *argv[])
 {
+	//A parameter file DNE
 	if (argc < 2)
 	{
-		printf("Input file name missing...exiting with error code -1\n");
+		printf("**ERROR**\n");
 		return -1;
 	}
 
@@ -55,12 +58,14 @@ int main(int argc, char *argv[])
 	Thread *threads;								//= malloc(sizeof(*threads)); // array of threads (size is determined in the readFile function)
 	int threadCount = readFile(filename, &threads); // creates the array of threads and returns the count
 
+	//Starts the time
 	startClock();
-	//printf("Times a tickin'! (clock is_running)\n");
 
+	//count for completed threads
 	int completed_t = 0;
 
 	programClock = time(NULL);
+	//Goes through all available threads
 	while (completed_t < threadCount)
 	{
 		for (int i = 0; i < threadCount; i++)
@@ -69,6 +74,7 @@ int main(int argc, char *argv[])
 			// time_t now = time(NULL);
 			if (!thread.is_running && getCurrentTime() == thread.start_time)
 			{
+				//create
 				threads[i].is_running = 1; // thread is running!
 				completed_t++;
 				pthread_t t_id = create_thread(&threads[i]);
@@ -80,9 +86,11 @@ int main(int argc, char *argv[])
 
 	for (int i = 0; i < threadCount; i++)
 	{
+		//joins threads
 		pthread_join(threads[i].t_id, NULL);
 		//printf("This is working4\n");
 	}
+	//free the threads...destroy get rid of
 	free(threads);
 	//printf("This is working5\n");
 
@@ -92,10 +100,12 @@ int main(int argc, char *argv[])
 //use this method in a suitable way to read file
 int readFile(char *fileName, Thread **threads)
 {
+	//opens and reads given file
 	FILE *in = fopen(fileName, "r");
+	//no file given
 	if (!in)
 	{
-		printf("Child A: Error in opening input file...exiting with error code -1\n");
+		printf("*ERROR**\n");
 		return -1;
 	}
 
@@ -111,6 +121,7 @@ int readFile(char *fileName, Thread **threads)
 			strncat(fileContent, line, strlen(line));
 		}
 	}
+	//close file
 	fclose(in);
 
 	char *command = NULL;
@@ -123,6 +134,7 @@ int readFile(char *fileName, Thread **threads)
 		threadCount++;
 		command = strtok(NULL, "\r\n");
 	}
+	//size of threads
 	*threads = malloc(sizeof(Thread) * threadCount);
 
 	char *lines[threadCount];
@@ -151,6 +163,7 @@ int readFile(char *fileName, Thread **threads)
 
 		Thread thread;
 		strcpy(thread.tid, tid);
+		//doesnt work without atoi
 		thread.start_time = atoi(start_time);
 		thread.lifetime = atoi(lifetime);
 		thread.is_running = 0;
@@ -163,6 +176,7 @@ int readFile(char *fileName, Thread **threads)
 
 void logStart(char *tID) //invoke this method when you start a thread
 {
+	//Changed from is started to is running
 	printf("[%ld] New Thread with ID %s is running.\n", getCurrentTime(), tID);
 }
 
@@ -177,19 +191,25 @@ void *threadRun(Thread *t) // thread starting routine
 	sleep(t->lifetime);
 	logFinish(t->tid);
 	// exit thread at the end of it's lifetime
+	//exit(0) causes errors
 	return NULL;
 }
 
+//Function that je;[s create the thread
 pthread_t create_thread(Thread *thread)
 {
+	//declares thread var
 	pthread_t t_id;
 	pthread_attr_t thread_attrib;
 	int status;
+	//avoid seg fault
 	status = pthread_attr_init(&thread_attrib);
+
 	if (status != 0)
 	{
 		printf("Error");
 	}
+	//create
 	status = pthread_create(&t_id, &thread_attrib, (void *)&threadRun, thread);
 	return t_id;
 }

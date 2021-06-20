@@ -6,8 +6,7 @@
     Date: 2021-06-19 (YYYY-MM-DD)
 
     GENERAL OBJECTIVE
-        
-    
+    Using multi-threading to complete differnt task at the same time.
     ************************************************************************************
 */
 // C libraries used within the program
