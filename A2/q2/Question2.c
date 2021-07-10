@@ -5,9 +5,7 @@
     Authors: Robert, Jagveer
     Date: 2021-06-19 (YYYY-MM-DD)
 
-    GENERAL OBJECTIVE
-        
-    
+    GENERAL OBJECTIVE    
     ************************************************************************************
 */
 // C libraries used within the program
