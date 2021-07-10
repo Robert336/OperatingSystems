@@ -1,6 +1,6 @@
 /*
  -------------------------------------
- File:    QuestionX.c
+ File:    Question1.c
  Project: A03Q1S21
  file description
  -------------------------------------
@@ -15,22 +15,23 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <semaphore.h>
 // Global Data variables.
 int a = 5, b = 7;
-pthread_mutex_t mutex;
+pthread_mutex_t m;
+sem_t mutex;
 // Function that access the global data.
 void *inc_dec(void *arg)
 {
-	pthread_mutex_lock(&mutex); // locked
+	sem_wait(&mutex); // locked
 
 	printf("Read value of 'a' global variable is: %d\n", a);
 	printf("Read value of 'b' global variable is: %d\n", b);
 	sleep(1);
 
-	pthread_mutex_unlock(&mutex); // unlocked
-
 	a = a + 1;
 	b = b - 1;
+	sem_post(&mutex); // unlocked
 	printf("Updated value of 'a' variable is: %d\n", a);
 	printf("Updated value of 'b' variable is: %d\n", b);
 	return 0;
@@ -38,6 +39,7 @@ void *inc_dec(void *arg)
 int main()
 {
 	// Creating the thread instances.
+	sem_init(&mutex, 0, 1);
 	pthread_t t1, t2, t3;
 	pthread_create(&t1, NULL, inc_dec, NULL);
 	pthread_create(&t2, NULL, inc_dec, NULL);
@@ -45,7 +47,7 @@ int main()
 	pthread_join(t1, NULL);
 	pthread_join(t2, NULL);
 	pthread_join(t3, NULL);
-
+	sem_destroy(&mutex);
 	//Destroying the threads.
 	pthread_exit(t1);
 	pthread_exit(t2);
