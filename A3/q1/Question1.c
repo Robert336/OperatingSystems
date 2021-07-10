@@ -49,8 +49,8 @@ int main()
 	pthread_join(t3, NULL);
 	sem_destroy(&mutex);
 	//Destroying the threads.
-	pthread_exit(t1);
-	pthread_exit(t2);
-	pthread_exit(t3);
+	pthread_exit(&t1);
+	pthread_exit(&t2);
+	pthread_exit(&t3);
 	return 0;
 }
